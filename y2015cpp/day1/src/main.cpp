@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
-#include "Moves.hpp"
+#include <chrono>
 #include "d1task1.hpp"
 #include "d1task2.hpp"
 using namespace std;
@@ -23,13 +23,21 @@ int main(){
             cout << "\nInvalid input!" <<"\n";
         }
         if (i_usr == 1){
+            auto start = chrono::high_resolution_clock::now();
             int answer_floor = perfTaskOne(inputpath.get());
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double, milli> elapsed_time{end - start};
             cout << "Santa ends up on floor: " << answer_floor << "\n";
+            cout << "Time taken to perform task: " << elapsed_time << "\n";
             return 0;
         }
         else if (i_usr == 2){
+            auto start = chrono::high_resolution_clock::now();
             int answer_pos = perfTaskTwo(inputpath.get());
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double, milli> elapsed_time{end - start};
             cout << "Instruction for entering the basement is located at: " << answer_pos << "\n";
+            cout << "Time taken to perform task: " << elapsed_time << "\n";
             return 0;
         }
     }
