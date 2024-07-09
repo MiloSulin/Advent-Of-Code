@@ -2,26 +2,28 @@
 
 // Perform task 2 of first puzzle, find location of instruction that tells Santa to enter basemen (floor -1)
 int perfTaskTwo(string* inputpath){
-    int santa_loc = 0;
-
-    ifstream input_stream(*inputpath, ios::binary); // create input stream from /path/to/input
+    int santa_loc = 0; // track location
+    int pos = 0;
+    ifstream input_stream(*inputpath, ios::binary | ios::ate); // create input stream from /path/to/input
     if (!input_stream.is_open())
         cerr << "Failed to open!" << "\n"; // throw error if something goes wrong when opening file
     else{
-        char* current_char = new char(); // allocate memory for char that is read from file
-        //
-        while(santa_loc > -1 && input_stream.get(*current_char)){ // read first/next character from file and terminate loop when end of file is reached or if Santa enter the basement
-            if (*current_char == '('){ // if current_char is '(' go up one floor
+        int size = input_stream.tellg();
+        char instructions[size]; // allocate memory for chars
+        input_stream.seekg(0);
+        input_stream.read(instructions, size);
+        input_stream.close();
+        int i = 0;
+        while(santa_loc > -1){ // iterate through instructions until basement is entered
+            if (instructions[i] == '('){ // if current_char is '(' go up one floor
                 santa_loc++;
             }
-            else if (*current_char == ')'){ // if current_char is ')' go down one floor
+            else if (instructions[i] == ')'){ // if current_char is ')' go down one floor
                 santa_loc--;
             }
+            i++;
         }
-        if(input_stream.eof())
-            cout << "Luettiin loppuun." << "\n";
-        delete current_char; // free memory
+        pos = i;
     };
-    int base_pos = input_stream.tellg();
-    return base_pos;
+    return pos;
 }

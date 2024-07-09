@@ -4,22 +4,23 @@
 int perfTaskOne(string* inputpath){
     int santa_loc = 0;
     
-    ifstream input_stream(*inputpath, ios::binary); // create input stream from /path/to/input
+    ifstream input_stream(*inputpath, ios::binary | ios::ate); // create input stream from /path/to/input
     if (!input_stream.is_open())
         cerr << "Failed to open!" << "\n"; // throw error if something goes wrong when opening file
     else{
-        char* current_char = new char(); // allocate memory for char that is read from file
-        //
-        while(input_stream.get(*current_char)){ // read first/next character from file and terminate loop when end of file is reached
-            if (*current_char == '('){ // if current_char is '(' go up one floor
+        int size = input_stream.tellg();
+        char instructions[size]; // initialise array for read chars
+        input_stream.seekg(0);
+        input_stream.read(reinterpret_cast<char*>(instructions), size);
+        input_stream.close();
+        for (int i=0; i < size; i++){ // iterate through instructions
+            if (instructions[i] == '('){ // if current_char is '(' go up one floor
                 santa_loc++;
             }
-            else if (*current_char == ')'){ // if current_char is ')' go down one floor
+            else if (instructions[i] == ')'){ // if current_char is ')' go down one floor
                 santa_loc--;
             }
         }
-        delete current_char; // free memory
     };
-
     return santa_loc;
 };

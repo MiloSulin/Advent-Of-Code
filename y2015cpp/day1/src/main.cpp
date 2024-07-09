@@ -12,8 +12,6 @@ using namespace std;
 unique_ptr<string> inputpath(new string("../input"));
 
 int main(){
-    bool input_err; // init error for user input
-
     cout << "Advent of Code 2015:\n" << "Type (1) or (2) to execute task 1 or 2 of day 1." << "\n";
     int i_usr;
     cout << "Choose task: ";
@@ -23,21 +21,21 @@ int main(){
             cout << "\nInvalid input!" <<"\n";
         }
         if (i_usr == 1){
-            auto start = chrono::high_resolution_clock::now();
-            int answer_floor = perfTaskOne(inputpath.get());
-            auto end = chrono::high_resolution_clock::now();
-            chrono::duration<double, milli> elapsed_time{end - start};
+            auto start{chrono::high_resolution_clock::now()}; // get start time
+            int answer_floor = perfTaskOne(inputpath.get()); // perform task
+            auto end{chrono::high_resolution_clock::now()};
+            chrono::duration<double, milli> elapsed_time{end - start}; // calculate elapsed time
             cout << "Santa ends up on floor: " << answer_floor << "\n";
-            cout << "Time taken to perform task: " << elapsed_time << "\n";
+            cout << "Time: " << elapsed_time << "\n";
             return 0;
         }
         else if (i_usr == 2){
-            auto start = chrono::high_resolution_clock::now();
-            int answer_pos = perfTaskTwo(inputpath.get());
-            auto end = chrono::high_resolution_clock::now();
-            chrono::duration<double, milli> elapsed_time{end - start};
+            auto start{chrono::high_resolution_clock::now()}; // get start time
+            int answer_pos = perfTaskTwo(inputpath.get()); // perform task
+            auto end{chrono::high_resolution_clock::now()};
+            chrono::duration<double, milli> elapsed_time{end - start}; // calculate elapsed time
             cout << "Instruction for entering the basement is located at: " << answer_pos << "\n";
-            cout << "Time taken to perform task: " << elapsed_time << "\n";
+            cout << "Time: " << elapsed_time << "\n";
             return 0;
         }
     }
