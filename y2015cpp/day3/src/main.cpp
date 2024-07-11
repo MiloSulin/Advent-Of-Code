@@ -61,7 +61,7 @@ int main(){
         (directions[instructions[i]])(); // execute move
         if(!(*rows).contains(row)){ // if row hasn't yet been visited, create set for row and add point
             unordered_set<int> new_row = {col};
-            (*rows).emplace(row, new_row);
+            (*rows).insert({row, new_row});
         }else { // if row already exists add point to set
             (*rows)[row].insert(col);
         }
