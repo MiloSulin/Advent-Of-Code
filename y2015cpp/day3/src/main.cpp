@@ -11,24 +11,24 @@ char input[] = "../input.txt";
 
 
 // indexes for row and column
-int* row = new int{};
-int* col = new int{};
+int row = 0;
+int col = 0;
 
-int* houses = new int{}; // total houses visited at least once
+int houses = 0; // total houses visited at least once
 
 class Moves{
     public:
         static void moveUp(){
-            (*row)++;
+            row++;
         }
         static void moveDown(){
-            (*row)--;
+            row--;
         }
         static void moveLeft(){
-            (*col)--;
+            col--;
         }
         static void moveRight(){
-            (*col)++;
+            col++;
         }
 };
 
@@ -41,11 +41,10 @@ unordered_map<char, dir_func> directions{
 
 int main(){
     auto start_t = chrono::high_resolution_clock::now();
-    unordered_map<int, unordered_set<int>*> rows; // container for data on rows
+    unordered_map<int, unordered_set<int>>* rows = new unordered_map<int, unordered_set<int>>{}; // container for data on rows
 
-    unordered_set<int>* first_row = new unordered_set<int>{}; // add first point (house) that is visited
-    rows[0] =  first_row;
-    rows[0]->insert(0);
+    unordered_set<int> first_row = {0}; // add first point (house) that is visited
+    (*rows).emplace(row, first_row);
 
     ifstream in_strm(input, ios::binary | ios::ate); // begin reading file
     if (!in_strm.is_open()){
@@ -60,20 +59,19 @@ int main(){
 
     for (int i=0; i<size; ++i){
         (directions[instructions[i]])(); // execute move
-        if(!rows.contains(*row)){ // if row hasn't yet been visited, create set for row and add point
-            unordered_set<int>* new_row = new unordered_set<int>{};
-            new_row->insert(*col);
-            rows[*row] = new_row;
+        if(!(*rows).contains(row)){ // if row hasn't yet been visited, create set for row and add point
+            unordered_set<int> new_row = {col};
+            (*rows).emplace(row, new_row);
         }else { // if row already exists add point to set
-            rows[*row]->insert(*col);
+            (*rows)[row].insert(col);
         }
     }
-    for (const auto e : rows){
-        *houses += e.second->size(); // check size of row (unique points visited on that row) and add to total houses visited
+    for (const auto &e : *rows){
+        houses += e.second.size(); // check size of row (unique points visited on that row) and add to total houses visited
     }
     auto end_t = chrono::high_resolution_clock::now();
     chrono::duration<double, milli> elapsed_time{end_t - start_t};
-    cout << "Total houses visited at least once: " << *houses << '\n';
+    cout << "Total houses visited at least once: " << houses << '\n';
     cout << "Time elapsed: " << elapsed_time << '\n';
     return 0;
 }
