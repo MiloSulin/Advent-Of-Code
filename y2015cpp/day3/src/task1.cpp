@@ -8,7 +8,6 @@ using dir_func = void (*)();
 int row = 0;
 int col = 0;
 
-int shouses = 1; // total houses visited at least once by santa
 
 class Moves{
     public:
@@ -33,7 +32,7 @@ unordered_map<char, dir_func> directions{
     {'>', &Moves::moveRight}
 };
 
-int perfTaskOne(char* instructions, size_t size){
+void perfTaskOne(char* instructions, size_t size, int* shouses){
     unordered_map<int, unordered_set<int>>* rows = new unordered_map<int, unordered_set<int>>{}; // container for data on rows
 
     unordered_set<int> first_row = {0}; // add first point (house) that is visited
@@ -44,12 +43,10 @@ int perfTaskOne(char* instructions, size_t size){
         if(!(*rows).contains(row)){ // if row hasn't yet been visited, create set for row and add point
             unordered_set<int> new_row = {col};
             (*rows).insert({row, new_row});
-            shouses++;
+            (*shouses)++;
         }else { // if row already exists add point to set
             if((*rows)[row].insert(col).second)
-                shouses++;
+                (*shouses)++;
         }
     }
-
-    return shouses;
 }

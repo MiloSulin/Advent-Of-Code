@@ -11,7 +11,6 @@ int santa_col = 0;
 int robo_row = 0;
 int robo_col = 0;
 
-int srhouses = 1; // total houses visited at least once by santa and robo santa
 
 class SantaMoves{
     public:
@@ -60,7 +59,7 @@ unordered_map<char, dir_func> robo_directions{
 };
 
 
-int perfTaskTwo(char* instructions, size_t size){
+void perfTaskTwo(char* instructions, size_t size, int* srhouses){
     unordered_map<int, unordered_set<int>>* rows = new unordered_map<int, unordered_set<int>>{}; // container for data on rows
 
     unordered_set<int> first_row = {0}; // add first point (house) that is visited
@@ -72,23 +71,21 @@ int perfTaskTwo(char* instructions, size_t size){
             if(!(*rows).contains(santa_row)){ // if row hasn't yet been visited, create set for row and add point
                 unordered_set<int> new_row = {santa_col};
                 (*rows).insert({santa_row, new_row});
-                srhouses++;
+                (*srhouses)++;
             }else { // if row already exists add point to set
                 if((*rows)[santa_row].insert(santa_col).second)
-                    srhouses++;
+                    (*srhouses)++;
             }
         }else {
             (robo_directions[instructions[i-1]])(); // execute move
             if(!(*rows).contains(robo_row)){ // if row hasn't yet been visited, create set for row and add point
                 unordered_set<int> new_row = {robo_col};
                 (*rows).insert({robo_row, new_row});
-                srhouses++;
+                (*srhouses)++;
             }else { // if row already exists add point to set
                 if((*rows)[robo_row].insert(robo_col).second)
-                    srhouses++;
+                    (*srhouses)++;
             }
         }
     }
-
-    return srhouses;
 }

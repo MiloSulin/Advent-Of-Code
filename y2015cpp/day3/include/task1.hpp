@@ -7,6 +7,6 @@ using namespace std;
 using dir_func = void (*)();
 
 
-int perfTaskOne(char* , size_t);
+void perfTaskOne(char*, size_t, int*);
 
 #endif
