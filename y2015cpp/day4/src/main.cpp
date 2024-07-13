@@ -16,11 +16,10 @@ struct Results{
 
 Results searchForZeroes(){
     int task1{};
-    int task2{};
     bool solved1 = false;
     bool solved2 = false;
     int trial = 0;
-    while(!solved1 || !solved2){
+    while(!solved2){
         trial++;
         stringstream buf;
         buf << key << trial;
@@ -33,13 +32,12 @@ Results searchForZeroes(){
                 task1 = trial;
                 solved1 = true;
             }else if(i == 5 && !solved2){
-                task2 = trial;
                 solved2 = true;
             }
         }
     }
 
-    return {task1, task2};
+    return {task1, trial};
 }
 
 
