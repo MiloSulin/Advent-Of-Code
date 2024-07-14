@@ -24,25 +24,14 @@ vector<valarray<char>> readInput(const string& filepath){
 
     char temp[32]; // char array for line hoping that it's smaller than 32 chars
     int line_length{};
-    int over_four{};
-    int unroll{};
 
     while(reader.getline(&temp[0], 32)){ // read line
         if (line_length == 0){
-            line_length = reader.gcount();
-            over_four = line_length % 4;
-            unroll = line_length - over_four;
+            line_length = reader.gcount(); // record how many chars were read and assume all lines are the same
         }
-         // record how many chars were read
+        
         valarray<char> line(line_length); // init valarray for line, should be faster to compare to rules using bitwise operators
-        int i=0;
-        for (; i<unroll; i+=4){ // from char array to valarray
-            line[i] = temp[i];
-            line[i+1] = temp[i+1];
-            line[i+2] = temp[i+2];
-            line[i+3] = temp[i+3];
-        }
-        for (; i<line_length; ++i){ // insert leftovers too
+        for (int i=0; i<line_length; ++i){ // from char array to valarray
             line[i] = temp[i];
         }
         input.push_back(line); // insert read line into input vector
