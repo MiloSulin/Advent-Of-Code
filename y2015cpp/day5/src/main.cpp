@@ -65,30 +65,25 @@ int main(){
         bool contains_forbid{false}; // contains forbid
         int vowel_count{0}; // contains three vowels
         for (int i=0; i<line.size()-1; ++i){
-            // check each char pair against forbidden sequences and return min element from result
-            // this will give the respective bool check value 0 if no forbidden sequence was found
-            bool f1_check = (valarray<bool>(line[std::slice(i,2,1)] == forbid1)).min();
-            bool f2_check = (valarray<bool>(line[std::slice(i,2,1)] == forbid2)).min();
-            bool f3_check = (valarray<bool>(line[std::slice(i,2,1)] == forbid3)).min();
-            bool f4_check = (valarray<bool>(line[std::slice(i,2,1)] == forbid4)).min();
-
-            if (f1_check | f2_check | f3_check | f4_check){
+            std::slice area_to_check(i, 2, 1);
+            if((line[area_to_check] == forbid1).min() || (line[area_to_check] == forbid2).min()
+            || (line[area_to_check] == forbid3).min() || (line[area_to_check] == forbid4).min()){
                 contains_forbid = true;
                 break;
+            }
+
+            if (vowels.contains(line[i])){
+                vowel_count++;
             }
 
             if(line[i] == line[i+1]){
                 double_letter = true;
             }
         }
-        valarray<bool> vowel_arr = (line == valarray<char>(vowels[0], line.size()));
-        vowel_arr |= (line == valarray<char>(vowels[1], line.size()));
-        vowel_arr |= (line == valarray<char>(vowels[2], line.size()));
-        vowel_arr |= (line == valarray<char>(vowels[3], line.size()));
-        vowel_arr |= (line == valarray<char>(vowels[4], line.size()));
-        for (const auto& vow : valarray<bool>(vowel_arr[vowel_arr == true])){
+        if (vowels.contains(line[line.size()])){
             vowel_count++;
         }
+        
         if(double_letter && vowel_count >= 3 && !contains_forbid){
             nice++;
         }
