@@ -35,6 +35,9 @@ documentation and/or software.
  
 /* system implementation headers */
 #include <cstdio>
+#include <string>
+#include <sstream>
+#include <bit>
  
  
 // Constants for MD5Transform routine.
@@ -54,6 +57,7 @@ documentation and/or software.
 #define S42 10
 #define S43 15
 #define S44 21
+ 
  
 ///////////////////////////////////////////////
  
@@ -78,23 +82,27 @@ inline MD5::uint4 MD5::I(uint4 x, uint4 y, uint4 z) {
 inline MD5::uint4 MD5::rotate_left(uint4 x, int n) {
   return (x << n) | (x >> (32-n));
 }
- 
+
 // FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
 // Rotation is separate from addition to prevent recomputation.
 inline void MD5::FF(uint4 &a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s, uint4 ac) {
-  a = rotate_left(a+ F(b,c,d) + x + ac, s) + b;
+  auto temp = a+ (b&c | (~b)&d) + x + ac;
+  a = rotate_left(temp, s) + b;
 }
  
 inline void MD5::GG(uint4 &a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s, uint4 ac) {
-  a = rotate_left(a + G(b,c,d) + x + ac, s) + b;
+  auto temp = a + (b&d | c&(~d)) + x + ac;
+  a = rotate_left(temp, s) + b;
 }
  
 inline void MD5::HH(uint4 &a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s, uint4 ac) {
-  a = rotate_left(a + H(b,c,d) + x + ac, s) + b;
+  auto temp = a + (b^c^d) + x + ac;
+  a = rotate_left(temp, s) + b;
 }
  
 inline void MD5::II(uint4 &a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s, uint4 ac) {
-  a = rotate_left(a + I(b,c,d) + x + ac, s) + b;
+  auto temp = a + (c ^ (b | (~d))) + x + ac;
+  a = rotate_left(temp, s) + b;
 }
  
 //////////////////////////////////////////////
@@ -330,19 +338,46 @@ MD5& MD5::finalize()
 }
  
 //////////////////////////////
- 
+
 // return hex representation of digest as string
 std::string MD5::hexdigest() const
 {
   if (!finalized)
     return "";
- 
-  char buf[33];
-  for (int i=0; i<16; i++)
-    sprintf(buf+i*2, "%02x", digest[i]);
-  buf[32]=0;
- 
-  return std::string(buf);
+  
+  static const char hexchars[] = "0123456789abcdef";
+  std::stringstream result;
+
+  for (int i = 0; i < 16; i+=4)
+  {
+      unsigned char b = digest[i];
+      unsigned char c = digest[i+1];
+      unsigned char d = digest[i+2];
+      unsigned char e = digest[i+3];
+      char hex1[3];
+      char hex2[3];
+      char hex3[3];
+      char hex4[3];
+
+      hex1[0] = hexchars[b >> 4];
+      hex1[1] = hexchars[b & 0xF];
+      hex1[2] = 0;
+
+      hex2[0] = hexchars[c >> 4];
+      hex2[1] = hexchars[c & 0xF];
+      hex2[2] = 0;
+
+      hex3[0] = hexchars[d >> 4];
+      hex3[1] = hexchars[d & 0xF];
+      hex3[2] = 0;
+
+      hex4[0] = hexchars[e >> 4];
+      hex4[1] = hexchars[e & 0xF];
+      hex4[2] = 0;
+
+      result << hex1 << hex2 << hex3 << hex4;
+  }
+  return result.str();
 }
  
 //////////////////////////////

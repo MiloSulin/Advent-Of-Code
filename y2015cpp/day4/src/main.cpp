@@ -24,7 +24,8 @@ Results searchForZeroes(){
         stringstream buf;
         buf << key << trial;
         string input = buf.str();
-        string output = md5(input);
+        MD5* hasher = new MD5{input};
+        auto output = hasher->hexdigest();
         for (int i=0; i<6; ++i){
             if(output[i] != '0')
                 break;
@@ -35,6 +36,7 @@ Results searchForZeroes(){
                 solved2 = true;
             }
         }
+        delete hasher;
     }
 
     return {task1, trial};

@@ -35,6 +35,7 @@ documentation and/or software.
  
 #include <cstring>
 #include <iostream>
+#include <string>
  
  
 // a small class for calculating MD5 hashes of strings or byte arrays
@@ -77,6 +78,7 @@ private:
   uint1 digest[16]; // the result
  
   // low level logic operations
+  static inline void ROUND_TAIL(uint4 &a, uint4 b, uint4 expr, uint4 k, uint4 s, uint4 t);
   static inline uint4 F(uint4 x, uint4 y, uint4 z);
   static inline uint4 G(uint4 x, uint4 y, uint4 z);
   static inline uint4 H(uint4 x, uint4 y, uint4 z);
