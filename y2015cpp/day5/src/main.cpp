@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <memory>
 #include <cmath>
 using namespace std::chrono;
 using std::cout, std::array, std::ifstream, std::string, std::vector;
@@ -109,5 +110,6 @@ int main(){
     duration<double, std::milli> elapsed_time{end_t - start_t};
     cout << "Nice strings: " << nice1 << '\n';
     cout << "Time taken: " << elapsed_time << '\n';
+    delete input;
     return 0;
 }
