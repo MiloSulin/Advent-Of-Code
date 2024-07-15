@@ -39,14 +39,15 @@ struct Results{
     int task2;
 };
 
-void taskOneRules(vector<array<char, 32>> lines, std::atomic<int>* nice){
-    for (auto& line : lines){
+void taskOneRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
+    int nice_own{0};
+    for (auto& line : *lines){
         bool double_letter{false}; // contains double letter
         bool contains_forbid{false}; // contains forbid
         int vowel_count{0}; // contains three vowels
         
         string test{""};
-        char* last_seen = nullptr;
+        char* last_seen = nullptr; // pointer to char that preceded the current one
         for (auto& e : line){
             if(!alphabet.contains(e)){
                 break;
@@ -69,29 +70,32 @@ void taskOneRules(vector<array<char, 32>> lines, std::atomic<int>* nice){
         }
         
         if(double_letter && vowel_count >= 3 && !contains_forbid){
-            (*nice)++;
+            nice_own++;
         }
     }
+    *nice += nice_own;
 }
 
-void taskTwoRules(vector<array<char, 32>> lines, std::atomic<int>* nice){
-    for (auto& line : lines){
+
+void taskTwoRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
+    int nice_own{0};
+    for (auto& line : *lines){
         bool repeat_letter{false}; // contains repeating letter
         bool repeat_pair{false}; // contains repeating pair
         
         char* one_back = nullptr; // char preceding current one
         char* two_back = nullptr; // char two places behind current one
 
-        string full_string{""}; // string to use for checking if string has repeating pair
-        for (auto& e : line){
-            if(!alphabet.contains(e)){ // incoming char array has empty places, stop reading line once we run out of real symbols
-                break;
-            }
-            full_string += e;
-        }
+        // string full_string{""}; // string to use for checking if string has repeating pair
+        // for (auto& e : line){
+        //     if(!alphabet.contains(e)){ // incoming char array has empty places, stop reading line once we run out of real symbols
+        //         break;
+        //     }
+        //     full_string += e;
+        // }
 
         int line_pos{0}; // index of current char
-        uint64_t line_length{full_string.length()};
+        uint64_t line_length{line.size()};
         for (auto& e : line){
             if(!alphabet.contains(e)){ // incoming char array has empty places, stop reading line once we run out of real symbols
                 break;
@@ -101,51 +105,52 @@ void taskTwoRules(vector<array<char, 32>> lines, std::atomic<int>* nice){
             if (line_pos >= 1 && !repeat_pair){
                 test += *one_back;
                 test += e;
-                if ( (full_string.substr(line_pos+1, line_length)).contains(test) ) // check if rest of string contains the current pair
+                string sub_str = string(line.begin() +line_pos+1, line.begin() +line_length);
+                if ( sub_str.contains(test) ) // check if rest of string contains the current pair
                     repeat_pair = true;
             }
 
             if(two_back != nullptr && one_back != nullptr && *two_back == e){
                 repeat_letter = true;
             }
-            two_back = &(*one_back);
+            two_back = one_back;
             one_back = &e;
 
             line_pos++;
         }
         if(repeat_letter & repeat_pair){
-            (*nice)++;
+            nice_own++;
         }
     }
+    *nice += nice_own;
 }
 
-Results perfTaskOne(vector<array<char, 32>>* input){
+Results perfTasks(vector<array<char, 32>>* input){
     int line_count = input->size();
     std::atomic<int>* nice1 = new std::atomic<int>{0};
     std::atomic<int>* nice2 = new std::atomic<int>{0};
 
-    int process_count = (std::thread::hardware_concurrency()) -2;
-    int lines_per_thread = 2* std::floor(line_count / process_count);
+    int process_count = (std::thread::hardware_concurrency() / 2 +2);
+    int lines_per_thread = 2* std::floor(line_count / (process_count-2));
     int left_over = line_count % lines_per_thread;
-    std::jthread* thread_pool[process_count+2];
+    std::jthread* thread_pool[process_count];
     int thread_count{0};
     int i{0};
 
     //solve tasks
-    for(; i<lines_per_thread*process_count / 2; i+=lines_per_thread){
-        vector<array<char, 32>> chunk((*input).begin() +i, (*input).begin() +i +lines_per_thread);
-        vector<array<char, 32>> chunk2((*input).begin() +i, (*input).begin() +i +lines_per_thread);
+    for(; i<lines_per_thread*(process_count-2) / 2; i+=lines_per_thread){
+        vector<array<char, 32>>* chunk = new vector<array<char, 32>>((*input).begin() +i, (*input).begin() +i +lines_per_thread);
         thread_pool[thread_count] = new std::jthread(taskOneRules, chunk, nice1);
-        thread_pool[thread_count+1] = new std::jthread(taskTwoRules, chunk2, nice2);
+        thread_pool[thread_count+1] = new std::jthread(taskTwoRules, chunk, nice2);
         thread_count+=2;
     }
-    vector<array<char, 32>> last_chunk((*input).begin() +i, (*input).begin() +line_count);
-    vector<array<char, 32>> last_chunk2((*input).begin() +i, (*input).begin() +line_count);
-    thread_pool[process_count] = new std::jthread(taskOneRules, last_chunk, nice1);
-    thread_pool[process_count+1] = new std::jthread(taskTwoRules, last_chunk2, nice2);
+    vector<array<char, 32>>* last_chunk = new vector<array<char, 32>>((*input).begin() +i, (*input).begin() +line_count);
+    thread_pool[process_count-2] = new std::jthread(taskOneRules, last_chunk, nice1);
+    thread_pool[process_count-1] = new std::jthread(taskTwoRules, last_chunk, nice2);
 
-    for(auto& worker : thread_pool){
-        worker->join();
+    for(int j=0; j<process_count; j+=2){
+        thread_pool[j]->join();
+        thread_pool[j+1]->join();
     }
 
     return {*nice1, *nice2};
@@ -163,16 +168,17 @@ TASK 2 RULES:
  */
 
 int main(){
-    const auto start_t = high_resolution_clock::now();
+    auto start_t = high_resolution_clock::now();
     // read input
     auto* input = new vector<array<char, 32>>{readInput("../input.txt")};
-    // perform task 1
-    auto [nice1, nice2] = perfTaskOne(input);
-    const auto end_t = high_resolution_clock::now();
+    // perform task 1 and 2
+    auto [nice1, nice2] = perfTasks(input);
+    auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
+
     cout << "Nice strings in task 1: " << nice1 << '\n';
     cout << "Nice strings in task 2: " << nice2 << '\n';
     cout << "Time taken: " << elapsed_time << '\n';
-    delete input;
+    input->clear();
     return 0;
 }
