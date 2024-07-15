@@ -1,13 +1,13 @@
 #include <iostream>
-#include <sstream>
 #include <fstream>
-#include <valarray>
 #include <vector>
 #include <array>
 #include <chrono>
 #include <thread>
+#include <atomic>
+#include <cmath>
 using namespace std::chrono;
-using std::cout, std::valarray, std::array, std::ifstream, std::stringstream, std::string, std::vector;
+using std::cout, std::array, std::ifstream, std::string, std::vector;
 
 const string forbid1 = "ab";
 const string forbid2 = "cd";
@@ -30,11 +30,8 @@ vector<array<char, 32>> readInput(const string& filepath){
     return input;
 }
 
-
-int perfTaskOne(vector<array<char, 32>>* input){
-    int nice{0};
-    //solve part 1
-    for (auto& line : *input){
+void taskOneRules(vector<array<char, 32>> lines, std::atomic<int>* nice){
+    for (auto& line : lines){
         bool double_letter{false}; // contains double letter
         bool contains_forbid{false}; // contains forbid
         int vowel_count{0}; // contains three vowels
@@ -63,10 +60,34 @@ int perfTaskOne(vector<array<char, 32>>* input){
         }
         
         if(double_letter && vowel_count >= 3 && !contains_forbid){
-            nice++;
+            (*nice)++;
         }
     }
-    return nice;
+}
+
+int perfTaskOne(vector<array<char, 32>>* input){
+    int line_count = input->size();
+    std::atomic<int>* nice = new std::atomic<int>{0};
+    int process_count = std::thread::hardware_concurrency() -4;
+    int lines_per_thread = std::floor(line_count / process_count);
+    int left_over = line_count % lines_per_thread;
+    std::jthread* thread_pool[process_count+1];
+    int thread_count{0};
+    int i{0};
+    //solve part 1
+    for(; i<lines_per_thread*process_count; i+=lines_per_thread){
+        vector<array<char, 32>> chunk((*input).begin() +i, (*input).begin() +i +lines_per_thread);
+        thread_pool[thread_count] = new std::jthread(taskOneRules, chunk, nice);
+        thread_count++;
+    }
+    vector<array<char, 32>> last_chunk((*input).begin() +i, (*input).begin() +line_count);
+    thread_pool[process_count] = new std::jthread(taskOneRules, last_chunk, nice);
+
+    for(auto& worker : thread_pool){
+        worker->join();
+    }
+
+    return *nice;
 }
 
 /* 
