@@ -101,22 +101,30 @@ void turnUpTwo(int& n){
     n += 2;
 }
 
+struct Results{
+    int task1;
+    int task2;
+};
 
-int taskOne(vector<Instruction>* input){
+Results performTasks(vector<Instruction>* input){
     int light_count{0};
     array<bool, 1000*1000> lights{false};
+    array<int, 1000*1000> lights2{0};
     for (auto e : *input){
         if(e.action == '>'){
             for(int i=0; i<e.y; ++i){
                 std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnOn);
+                std::for_each(lights2.begin()+e.start_point+(i*1000), lights2.begin()+e.x+e.start_point+(i*1000), turnUp);
             }
         }else if(e.action == '<'){
             for(int i=0; i<e.y; ++i){
                 std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnOff);
+                std::for_each(lights2.begin()+e.start_point+(i*1000), lights2.begin()+e.x+e.start_point+(i*1000), turnDown);
             }
         }else if(e.action == '^'){
             for(int i=0; i<e.y; ++i){
                 std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), toggle);
+                std::for_each(lights2.begin()+e.start_point+(i*1000), lights2.begin()+e.x+e.start_point+(i*1000), turnUpTwo);
             }
         }
     }
@@ -126,36 +134,15 @@ int taskOne(vector<Instruction>* input){
             light_count++;
         }
     }
-    return light_count;
-}
-
-int taskTwo(vector<Instruction>* input){
-    array<int, 1000*1000> lights{0};
-    for (auto& e : *input){
-        if(e.action == '>'){
-            for(int i=0; i<e.y; ++i){
-                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnUp);
-            }
-        }else if(e.action == '<'){
-            for(int i=0; i<e.y; ++i){
-                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnDown);
-            }
-        }else if(e.action == '^'){
-            for(int i=0; i<e.y; ++i){
-                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnUpTwo);
-            }
-        }
-    }
-
     int intensity_sum{0};
-    for(int j=0; j<lights.size(); j+=4){
-        intensity_sum += lights[j];
-        intensity_sum += lights[j+1];
-        intensity_sum += lights[j+2];
-        intensity_sum += lights[j+3];
+    for(int j=0; j<lights2.size(); j+=4){
+        intensity_sum += lights2[j];
+        intensity_sum += lights2[j+1];
+        intensity_sum += lights2[j+2];
+        intensity_sum += lights2[j+3];
     }
 
-    return intensity_sum;
+    return {light_count, intensity_sum};
 }
 
 
@@ -163,8 +150,7 @@ int main(){
     auto start_t = high_resolution_clock::now();
         
     auto input = readInput("../input.txt");
-    int lights1{taskOne(&input)};
-    int lights2(taskTwo(&input));
+    auto [lights1, lights2] = performTasks(&input);
 
     auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
