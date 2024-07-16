@@ -9,16 +9,14 @@ TASK 1: How many lights are on?
 #include <array>
 #include <vector>
 #include <stdexcept>
-#include <valarray>
+#include <span>
 #include <chrono>
+#include <algorithm>
 
 using namespace std::chrono;
-using std::cout, std::cerr, std::string, std::array, std::vector, std::fstream, std::valarray;
+using std::cout, std::cerr, std::string, std::array, std::vector, std::fstream;
 
 constexpr string allowed_actions = "on off toggle";
-
-valarray<bool> lights_on(true, 1000*1000);
-valarray<bool> lights_off(false, 1000*1000);
 
 
 struct Instruction{
@@ -41,8 +39,8 @@ Instruction::Instruction(string Action, array<int, 4> start_end_p) {
     } else{
         cerr << "Instruction: Invalid input for action!\n";
     }
-    x = start_end_p[2] - start_end_p[0];
-    y = start_end_p[3] - start_end_p[1];
+    x = start_end_p[2] - start_end_p[0] +1;
+    y = start_end_p[3] - start_end_p[1] +1;
     start_point = (start_end_p[1] - 1) * 1000 + start_end_p[0];
 };
 
@@ -81,39 +79,98 @@ vector<Instruction> readInput(const string& filepath){
     return input;
 }
 
+void turnOn(bool& n){
+    n |= true;
+}
+void turnOff(bool& n){
+    n &= false;
+}
+void toggle(bool& n){
+    n ^= true;
+}
 
-int main(){
-    const auto start_t = high_resolution_clock::now();
+void turnUp(int& n){
+    n++;
+}
+void turnDown(int& n){
+    if(n!=0){
+        n--;
+    }
+}
+void turnUpTwo(int& n){
+    n += 2;
+}
+
+
+int taskOne(vector<Instruction>* input){
     int light_count{0};
-    auto input = readInput("../input.txt");
-    valarray<bool> lights(false, 1000*1000);
-    for (auto& e : input){
-        std::gslice slice(e.start_point, {e.y, e.x}, {1000, 1});
+    array<bool, 1000*1000> lights{false};
+    for (auto e : *input){
         if(e.action == '>'){
-            lights[slice] |= lights_on[slice];
-        } else if(e.action == '<'){
-            lights[slice] &= lights_off[slice];
-        } else if(e.action == '^'){
-            lights[slice] ^= lights_on[slice];
+            for(int i=0; i<e.y; ++i){
+                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnOn);
+            }
+        }else if(e.action == '<'){
+            for(int i=0; i<e.y; ++i){
+                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnOff);
+            }
+        }else if(e.action == '^'){
+            for(int i=0; i<e.y; ++i){
+                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), toggle);
+            }
         }
     }
-    for (auto& e : lights){
-        cout << e;
-    }
-    // valarray<bool> test(5*5);
-    // std::gslice slice(2, {3, 3}, {5, 1});
-    // test[slice] |= lights_on[slice];
-    // for(int i=0; i<25; ++i){
-    //     cout << test[i] << ' ';
-    //     if(i+1 % 5 == 0){
-    //         cout << '\n';
-    //     }
-    // }
-    // cout << '\n';
 
-    const auto end_t = high_resolution_clock::now();
+    for(auto e : lights){
+        if(e){
+            light_count++;
+        }
+    }
+    return light_count;
+}
+
+int taskTwo(vector<Instruction>* input){
+    array<int, 1000*1000> lights{0};
+    for (auto& e : *input){
+        if(e.action == '>'){
+            for(int i=0; i<e.y; ++i){
+                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnUp);
+            }
+        }else if(e.action == '<'){
+            for(int i=0; i<e.y; ++i){
+                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnDown);
+            }
+        }else if(e.action == '^'){
+            for(int i=0; i<e.y; ++i){
+                std::for_each(lights.begin()+e.start_point+(i*1000), lights.begin()+e.x+e.start_point+(i*1000), turnUpTwo);
+            }
+        }
+    }
+
+    int intensity_sum{0};
+    for(int j=0; j<lights.size(); j+=4){
+        intensity_sum += lights[j];
+        intensity_sum += lights[j+1];
+        intensity_sum += lights[j+2];
+        intensity_sum += lights[j+3];
+    }
+
+    return intensity_sum;
+}
+
+
+int main(){
+    auto start_t = high_resolution_clock::now();
+        
+    auto input = readInput("../input.txt");
+    int lights1{taskOne(&input)};
+    int lights2(taskTwo(&input));
+
+    auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
-    cout << "Lights in task 1: " << light_count << '\n';
+
+    cout << "Lights in task 1: " << lights1 << '\n';
+    cout << "Light instensity in task 2: " << lights2 << '\n';
     cout << "Time taken: " << elapsed_time << std::endl;
     
     return 0;
