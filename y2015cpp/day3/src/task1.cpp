@@ -32,7 +32,7 @@ unordered_map<char, dir_func> directions{
     {'>', &Moves::moveRight}
 };
 
-void perfTaskOne(char* instructions, size_t size, int* shouses){
+void perfTaskOne(char* instructions, int size, int* shouses){
     unordered_map<int, unordered_set<int>>* rows = new unordered_map<int, unordered_set<int>>{}; // container for data on rows
 
     unordered_set<int> first_row = {0}; // add first point (house) that is visited

@@ -23,7 +23,7 @@ int main(){
         cerr << "Failed to open!" << '\n';
         return 1;
     }
-    size_t size = in_strm.tellg();
+    int size = in_strm.tellg();
     in_strm.seekg(0);
     char* instructions = new char[size];
     in_strm.read(instructions, size*sizeof(char));

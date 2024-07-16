@@ -47,7 +47,7 @@ void taskOneRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
         
         char* last_seen = nullptr; // pointer to char that preceded the current one
         for (auto& e : line){
-            if(!alphabet.contains(*line_p)){
+            if(!alphabet.contains(e)){
                 break;
             }
 
@@ -84,11 +84,10 @@ void taskTwoRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
         bool repeat_letter{false}; // contains repeating letter
         bool repeat_pair{false}; // contains repeating pair
         
-        char* two_back = nullptr; // char two places behind current one
         int line_pos{0}; // index of current char
 
         for (auto& e : line){
-            if(!alphabet.contains(*line_p)){ // incoming char array has empty places, stop reading line once we run out of real symbols
+            if(!alphabet.contains(e)){ // incoming char array has empty places, stop reading line once we run out of real symbols
                 break;
             }
 
@@ -122,7 +121,6 @@ Results perfTasks(vector<array<char, 32>>* input){
 
     int process_count = (std::thread::hardware_concurrency() -2);
     int lines_per_thread = 2* std::floor(line_count / (process_count-2));
-    int left_over = line_count % lines_per_thread;
     std::jthread* thread_pool[process_count];
     int thread_count{0};
     int i{0};
