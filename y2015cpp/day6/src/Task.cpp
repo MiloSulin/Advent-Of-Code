@@ -1,4 +1,5 @@
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <execution>
 #include "Task.hpp"
@@ -27,8 +28,8 @@ void turnUpTwo(int& n){
 Results performTasks(std::vector<Instruction>* input){
     int light_count{0};
     int intensity_sum{0};
-    bool lights[1000*1000] = {false};
-    int lights2[1000*1000] = {0};
+    std::array<bool,1000*1000> lights{false};
+    std::array<int, 1000*1000> lights2{0};
     for (auto e : *input){
         bool* light_start = &(lights[e.start_point]);
         int* light2_start = &(lights2[e.start_point]);
