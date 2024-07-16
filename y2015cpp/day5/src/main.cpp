@@ -51,7 +51,8 @@ void taskOneRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
                 break;
             }
 
-            if (vowels.contains(*line_p)){
+            if (std::memcmp(line_p, "a", 1)==0 || std::memcmp(line_p, "e", 1)==0 || std::memcmp(line_p, "i", 1)==0 || std::memcmp(line_p, "o", 1)==0 
+            || std::memcmp(line_p, "u", 1)==0){
                 vowel_count++;
             }
 
@@ -85,7 +86,6 @@ void taskTwoRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
         
         char* two_back = nullptr; // char two places behind current one
         int line_pos{0}; // index of current char
-        uint64_t line_length{line.size()};
 
         for (auto& e : line){
             if(!alphabet.contains(*line_p)){ // incoming char array has empty places, stop reading line once we run out of real symbols
@@ -93,18 +93,17 @@ void taskTwoRules(vector<array<char, 32>>* lines, std::atomic<int>* nice){
             }
 
             if(!repeat_pair){
-                for(int i=2; i<line_length-line_pos; ++i){
+                for(int i=2; i<32-line_pos; ++i){
                     if(std::memcmp(line_p, line_p+i, 2)==0){
                         repeat_pair = true;
                     }
                 }
             }
 
-            if(!repeat_letter && two_back != nullptr && *two_back == *line_p){
+            if(!repeat_letter && *line_p == *(line_p+2)){
                 repeat_letter = true;
             }
             line_pos++;
-            two_back = line_p-1;
             line_p++;
             if(repeat_letter && repeat_pair){
                 nice_own++;
@@ -159,21 +158,17 @@ TASK 2 RULES:
  */
 
 int main(){
-    duration<double, std::milli> sum{0};
-    for(int i=0; i<10000; ++i){
-        auto start_t = high_resolution_clock::now();
-        // read input
-        auto* input = new vector<array<char, 32>>{readInput("../input.txt")};
-        // perform task 1 and 2
-        auto [nice1, nice2] = perfTasks(input);
-        auto end_t = high_resolution_clock::now();
-        duration<double, std::milli> elapsed_time{end_t - start_t};
-        sum += elapsed_time;
-    }
-    cout << "Average time: " << sum/10000 << '\n';
-    // cout << "Nice strings in task 1: " << nice1 << '\n';
-    // cout << "Nice strings in task 2: " << nice2 << '\n';
-    // cout << "Time taken: " << elapsed_time << '\n';
-    // input->clear();
+    auto start_t = high_resolution_clock::now();
+    // read input
+    auto* input = new vector<array<char, 32>>{readInput("../input.txt")};
+    // perform task 1 and 2
+    auto [nice1, nice2] = perfTasks(input);
+    auto end_t = high_resolution_clock::now();
+    duration<double, std::milli> elapsed_time{end_t - start_t};
+
+    cout << "Nice strings in task 1: " << nice1 << '\n';
+    cout << "Nice strings in task 2: " << nice2 << '\n';
+    cout << "Time taken: " << elapsed_time << '\n';
+    input->clear();
     return 0;
 }

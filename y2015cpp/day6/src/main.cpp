@@ -5,25 +5,31 @@ TASK 1: How many lights are on?
 
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <array>
 #include <vector>
+#include <stdexcept>
+#include <valarray>
+#include <chrono>
 
-using std::cout, std::cerr, std::string, std::array, std::vector, std::fstream, std::stringstream;
+using namespace std::chrono;
+using std::cout, std::cerr, std::string, std::array, std::vector, std::fstream, std::valarray;
 
-constexpr string number_digits = "0123456789";
 constexpr string allowed_actions = "on off toggle";
+
+valarray<bool> lights_on(true, 1000*1000);
+valarray<bool> lights_off(false, 1000*1000);
+
 
 struct Instruction{
     Instruction(string action, array<int, 4> start_end_p);
     // type of action to perform, can be: '<' turn off, '>' turn on, '^' toggle
     char action;
     // starting coordinate
-    int start_point;
+    size_t start_point;
     // dimensions of the area in x and y directions
-    int x;
-    int y;
+    uint64_t x;
+    uint64_t y;
 };
 Instruction::Instruction(string Action, array<int, 4> start_end_p) {
     if(Action == "on"){
@@ -33,11 +39,11 @@ Instruction::Instruction(string Action, array<int, 4> start_end_p) {
     } else if(Action == "toggle"){
         action = '^';
     } else{
-        cerr << "Invalid input of action in Instruction!\n";
+        cerr << "Instruction: Invalid input for action!\n";
     }
-    x = {start_end_p[2] - start_end_p[0]};
-    y = {start_end_p[3] - start_end_p[1]};
-    start_point = (start_end_p[0] * 1000) + start_end_p[1];
+    x = start_end_p[2] - start_end_p[0];
+    y = start_end_p[3] - start_end_p[1];
+    start_point = (start_end_p[1] - 1) * 1000 + start_end_p[0];
 };
 
 vector<Instruction> readInput(const string& filepath){
@@ -77,13 +83,38 @@ vector<Instruction> readInput(const string& filepath){
 
 
 int main(){
+    const auto start_t = high_resolution_clock::now();
+    int light_count{0};
     auto input = readInput("../input.txt");
-    for (int i=0; i<20; ++i){
-        cout << input[i].action << '\n';
-        cout << input[i].start_point << '\n';
-        cout << input[i].x << '\n';
-        cout << input[i].y << '\n';
+    valarray<bool> lights(false, 1000*1000);
+    for (auto& e : input){
+        std::gslice slice(e.start_point, {e.y, e.x}, {1000, 1});
+        if(e.action == '>'){
+            lights[slice] |= lights_on[slice];
+        } else if(e.action == '<'){
+            lights[slice] &= lights_off[slice];
+        } else if(e.action == '^'){
+            lights[slice] ^= lights_on[slice];
+        }
     }
-    cout << std::endl;
+    for (auto& e : lights){
+        cout << e;
+    }
+    // valarray<bool> test(5*5);
+    // std::gslice slice(2, {3, 3}, {5, 1});
+    // test[slice] |= lights_on[slice];
+    // for(int i=0; i<25; ++i){
+    //     cout << test[i] << ' ';
+    //     if(i+1 % 5 == 0){
+    //         cout << '\n';
+    //     }
+    // }
+    // cout << '\n';
+
+    const auto end_t = high_resolution_clock::now();
+    duration<double, std::milli> elapsed_time{end_t - start_t};
+    cout << "Lights in task 1: " << light_count << '\n';
+    cout << "Time taken: " << elapsed_time << std::endl;
+    
     return 0;
 }
