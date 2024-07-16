@@ -1,7 +1,3 @@
-/* 
-READ LIGHTING INSTRUCTIONS
-TASK 1: How many std::begin(lights) are on?
- */
 
 #include <iostream>
 #include <fstream>
@@ -53,8 +49,6 @@ vector<Instruction> readInput(const string& filepath){
     
     return input;
 }
-
-
 
 
 int main(){
