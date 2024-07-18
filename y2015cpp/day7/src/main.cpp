@@ -1,5 +1,4 @@
 #include <iostream>
-#include <unordered_map>
 #include <fstream>
 #include <array>
 #include <string>
@@ -7,48 +6,49 @@
 #include <chrono>
 #include <vector>
 #include <cmath>
-#include <unordered_set>
-#include "Instruction.hpp"
+#include "Circuit.hpp"
 
 using namespace std::chrono;
 using std::cout, std::unordered_map, std::fstream, std::array, std::string, std::vector, std::unordered_set;
 
 
-array<char, 1024*1024> input;
 
-void readInput(string filepath){ 
+void readInput(string filepath, char* write_start){ 
     fstream reader{filepath};
     if(!reader.is_open()){
         throw std::runtime_error("Something wen't wrong when opening input file!") ;
     }
-    reader.read(&input[0], 1024*1024);
+    reader.read(write_start, 1024*1024);
     reader.close();
 }
 
+vector<Instruction*> buildInstructions(char* pointer_to_input){
+    vector<string> temp{};
+    vector<Instruction*> instructions{};
+    while((*pointer_to_input) != '\0'){
+        string instruct{};
+        while((*pointer_to_input) != ' ' && (*pointer_to_input) != '\n'){
+            instruct += *pointer_to_input;
+            pointer_to_input++;
+        }
+        temp.push_back(instruct);
+        if(*pointer_to_input == '\n'){
+            instructions.push_back(new Instruction{temp});
+            temp.clear();
+        }
+        pointer_to_input++;
+    }
+    return instructions;
+}
 
 int main(){
     const auto start_t = high_resolution_clock::now();
 
-    readInput("../input.txt");
+    array<char, 1024 * 1024> input;
+    readInput("../input.txt", &input[0]);
     char* inptr = &input[0];
-    vector<string> temp{};
-    vector<Instruction*> instructions{};
-    while((*inptr) != '\0'){
-        string instruct{};
-        while((*inptr) != ' ' && (*inptr) != '\n'){
-            instruct += *inptr;
-            inptr++;
-        }
-        temp.push_back(instruct);
-        if(*inptr == '\n'){
-            instructions.push_back(new Instruction{temp});
-            temp.clear();
-        }
-        inptr++;
-    }
-    for (int i=0; i<15; ++i){
-        cout << *(instructions[i]) <<'\n';
-    }
+    auto instructions = buildInstructions(inptr);
+    Circuit bobbys_circuit = Circuit(instructions);
     const auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
 
