@@ -8,6 +8,7 @@
 #include "Instruction.hpp"
 
 using std::cout, std::string, std::vector, std::unordered_set, std::unordered_map;
+using actionptr = int (*)();
 
 
 class Circuit{

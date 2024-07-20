@@ -17,6 +17,7 @@ Instruction::Instruction(vector<string> input){
             output = e;
         }
         else if (number_digits.contains(e[0])){
+            value = 0;
             int magnitude = e.length() - 1;
             for (auto &c : e){
                 value += (c - '0') * std::pow(10, magnitude);

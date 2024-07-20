@@ -46,9 +46,11 @@ int main(){
 
     array<char, 1024 * 1024> input;
     readInput("../input.txt", &input[0]);
+    
     char* inptr = &input[0];
     auto instructions = buildInstructions(inptr);
     Circuit bobbys_circuit = Circuit(instructions);
+
     const auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
 

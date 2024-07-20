@@ -13,7 +13,7 @@ struct Instruction{
     string input1{};
     string input2{};
     string Action{};
-    int value{};
+    int value{-1};
     string output;
 };
 std::ostream &operator<<(std::ostream&, const Instruction&);
