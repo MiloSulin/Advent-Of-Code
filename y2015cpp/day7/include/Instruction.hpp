@@ -12,7 +12,15 @@ struct Instruction{
     Instruction(vector<string>);
     string input1{};
     string input2{};
-    string Action{};
+    enum struct Action {
+        IAND,
+        IOR,
+        INOT,
+        IRSHIFT,
+        ILSHIFT,
+        IASSIGN
+    };
+    Action act;
     int value{-1};
     string output;
 };

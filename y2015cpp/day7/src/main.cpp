@@ -16,7 +16,7 @@ using std::cout, std::unordered_map, std::fstream, std::array, std::string, std:
 void readInput(string filepath, char* write_start){ 
     fstream reader{filepath};
     if(!reader.is_open()){
-        throw std::runtime_error("Something wen't wrong when opening input file!") ;
+        throw std::runtime_error("Something went wrong when opening input file!") ;
     }
     reader.read(write_start, 1024*1024);
     reader.close();
@@ -50,6 +50,7 @@ int main(){
     char* inptr = &input[0];
     auto instructions = buildInstructions(inptr);
     Circuit bobbys_circuit = Circuit(instructions);
+    cout << "Result for task 1: " << bobbys_circuit.returnWire("a") << "\n";
 
     const auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
