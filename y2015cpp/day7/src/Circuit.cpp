@@ -10,33 +10,6 @@
 
 using std::cout, std::string, std::vector, std::unordered_set, std::unordered_map;
 
-/* int perfAnd(int in1, int in2){
-    return in1 & in2;
-};
-
-int perfOr(int in1, int in2){
-    return in1 | in2;
-};
-
-int perfNot(int input){
-    return ~input;
-};
-
-int perfRshift(int input, int value){
-    return input >> value;
-};
-
-int perfLshift(int input, int value){
-    return input << value;
-};
-
-unordered_map<string, actionptr> actionFunctions{
-    {"AND", &perfAnd},
-    {"OR" , &perfOr},
-    {"NOT", &perfNot},
-    {"RSHIFT", &perfRshift},
-    {"LSHIFT", &perfLshift},
-}; */
 
 int Circuit::performAction(Instruction* instr) {
     int return_value{};
@@ -65,6 +38,7 @@ Circuit::Circuit(vector<Instruction*> &in_vector){
         if(e->input1.empty() && e->input2.empty()){
             wires.insert({e->output, e->value});
             new_connections.push_back(e);
+            sorted_gates.push_back(e);
         }
     }
     updateWires(&in_vector);
@@ -75,6 +49,20 @@ Circuit::Circuit(vector<Instruction*> &in_vector){
     }
 };
 
+void Circuit::secondLoop() {
+    wires.clear();
+    for (const auto& e : sorted_gates){
+        int output_value{};
+        if (e->output == "b"){
+            wires.insert({"b", 3176});
+        } else if (e->input1.empty() && e->input2.empty()){
+            wires.insert({e->output, e->value});
+        } else {
+            output_value = performAction(e);
+            wires.insert({e->output, output_value});
+        }
+    }
+}
 
 void Circuit::updateWires(vector<Instruction*>* in_vector){
     auto predicate = [to_remove=&new_connections](Instruction* instr) -> bool {return std::find(to_remove->begin(), to_remove->end(), instr) != to_remove->end();};
@@ -90,20 +78,9 @@ void Circuit::readInstruction(vector<Instruction*>* in_vector){
             (wires.contains(e->input1) && wires.contains(e->input2)) ) {
             output_value = performAction(e);
             new_connections.push_back(e);
+            sorted_gates.push_back(e);
             wires.insert({e->output, output_value});
         } 
-
-        // if(!e->input1.empty() && wires.contains(e->input1) && e->input2.empty()){
-        //     if(e->value != -1){
-        //         output_value = (actionFunctions[e->Action])(e->input1, e->value);
-        //     } else{
-        //         output_value = (actionFunctions[e->Action])(e->input1);
-        //     }
-        //     new_connections.push_back(*e);
-        // }else if(wires.contains(e->input1) && wires.contains(e->input2)){
-        //     output_value = (actionFunctions[e->Action])(e->input1, e->input2);
-        //     new_connections.push_back(*e);
-        // }
     }
 }
 

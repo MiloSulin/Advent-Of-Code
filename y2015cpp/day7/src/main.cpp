@@ -51,6 +51,8 @@ int main(){
     auto instructions = buildInstructions(inptr);
     Circuit bobbys_circuit = Circuit(instructions);
     cout << "Result for task 1: " << bobbys_circuit.returnWire("a") << "\n";
+    bobbys_circuit.secondLoop();
+    cout << "Result for task 2: " << bobbys_circuit.returnWire("a") << "\n";
 
     const auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};

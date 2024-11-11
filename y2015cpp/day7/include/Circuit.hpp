@@ -15,9 +15,11 @@ class Circuit{
     public: Circuit(vector<Instruction*>&); // initialises the circuit
     void readInstruction(vector<Instruction*>*);
     void updateWires(vector<Instruction*>*);
+    void secondLoop();
     int returnWire(string); // returns the value of the wire given as argument
     int performAction(Instruction*);
     private:
         unordered_map<string, int> wires;
         vector<Instruction*> new_connections;
+        vector<Instruction*> sorted_gates;
 };
