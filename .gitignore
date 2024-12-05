@@ -1,3 +1,5 @@
 # ignore CMake build dirs
 **/build
 **/.vscode
+**/input.txt
+**/input

@@ -2,11 +2,24 @@
 #define __ADVENT_OF_CODE_H__
 
 #include <iostream>
+#include <fstream>
 #include <format>
 #include <string>
 #include <vector>
 
-std::vector<std::string> stringSplit(std::string str_arg, char split_by, int skip_all=1){
+namespace advoc{
+
+    void readInput(std::string filepath, char* w_start){
+    std::fstream reader{filepath};
+    if (!reader.is_open()){
+        std::cerr << "Shit broke!\n";
+    }
+    reader.read(w_start, 1024*1024);
+    reader.close();
+    }
+
+
+    std::vector<std::string> stringSplit(std::string str_arg, char split_by, int skip_all=1){
     /*
     Splits given string into parts based on argument and returns a vector containing the new strings.
     ARGUMENTS:
@@ -15,7 +28,7 @@ std::vector<std::string> stringSplit(std::string str_arg, char split_by, int ski
     int skip_all - Skip all consecutive split chars as well as spaces, 1 (true) by default, if 0 (false) then only first split char is used
     RETURNS:
     std::vector<std::string> - Vector containing the new strings
-     */
+        */
     std::vector<std::string> new_strings{};
 
     // check if skip_all argument is allowed (is 1 or 0)
@@ -31,6 +44,10 @@ std::vector<std::string> stringSplit(std::string str_arg, char split_by, int ski
     for (size_t i=0; i<original_len; i++){
         // When encountering a split char or end of the string add new split string to return container
         if ( (str_arg.at(i) == split_by) && (i != start_pos) ){
+            new_strings.push_back(str_arg.substr(start_pos, i - start_pos));
+            new_word = false;
+            continue;
+        } else if ( (str_arg.at(i) == '\0') && (new_word == true) ){
             new_strings.push_back(str_arg.substr(start_pos, i - start_pos));
             new_word = false;
             continue;
@@ -54,14 +71,14 @@ std::vector<std::string> stringSplit(std::string str_arg, char split_by, int ski
                     // shouldn't happen
                     break;
             }
-        } else if ( (new_word == false) && (str_arg.at(i) != split_by || str_arg.at(i) != ' ') ){
+        } else if ( (new_word == false) && (str_arg.at(i) != split_by || str_arg.at(i) != ' ') && (str_arg.at(i) != '\0')){
             new_word = true;
             start_pos = i; // set starting pos for new string
         }
     }
 
     return new_strings;
+    }
 }
-
 
 #endif
