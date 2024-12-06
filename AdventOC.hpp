@@ -9,12 +9,12 @@
 
 namespace advoc{
 
-    void readInput(std::string filepath, char* w_start){
+    void readInput(std::string filepath, char* w_start, uint bufsize){
     std::fstream reader{filepath};
     if (!reader.is_open()){
         std::cerr << "Shit broke!\n";
     }
-    reader.read(w_start, 1024*1024);
+    reader.read(w_start, bufsize);
     reader.close();
     }
 

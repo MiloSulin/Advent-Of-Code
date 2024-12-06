@@ -11,12 +11,39 @@
 using namespace std::chrono;
 using std::cout, std::array, std::string;
 
+/* 
+For some reason my code always gives one too many for task 1 and two less for task 2.
+ */
+
+uint checkSafe(std::vector<int> report, std::vector<size_t>& bad_ind){
+    int delta_direction{0};
+    uint is_ok{1}; // 1 or 0
+    for (size_t i=0; i<report.size()-1; i++){
+        int distance{report.at(i) - report.at(i+1)};
+        int distance_abs{std::abs(distance)};
+        int distance_dir{0};
+        if (distance != 0){
+            distance_dir = distance / distance_abs;
+        }
+        if (distance_abs < 1 || distance_abs > 3){
+            is_ok = 0;
+            bad_ind.push_back(i);
+        } else if(delta_direction == 0 && distance != 0){
+            delta_direction = distance_dir; // assign direction of level change to 1 or -1
+        } else if (distance_dir != delta_direction){
+            is_ok = 0;
+            bad_ind.push_back(i);
+        }
+    }
+    return is_ok;
+}
+
 
 int main(){
     const auto start_t = high_resolution_clock::now();
 
     array<char, 128 * 1024> input{};
-    advoc::readInput("../input.txt", &input[0]);
+    advoc::readInput("../input.txt", &input[0], 128 * 1024);
 
     std::vector<string> lines = advoc::stringSplit(string{input.begin(), input.end()}, '\n');
     std::vector<std::vector<int>> num_lines;
@@ -30,12 +57,45 @@ int main(){
         num_lines.push_back(numbers);
     }
     
-    int task1_sol{0};
+    uint task1_sol{0};
+    uint task2_sol{0};
+    for (auto& report : num_lines){
+        std::vector<size_t> bad_indices{};
+        uint is_ok1{0};
+        is_ok1 = checkSafe(report, bad_indices);
+        task1_sol += is_ok1;
+        
+        size_t bad_amount{bad_indices.size()};
+        uint is_ok2{0};
+        if (bad_amount == 1  && bad_indices.at(0) == 0){
+            std::vector<int> new_report(report.begin()+1, report.end());
+            is_ok2 = checkSafe(new_report, bad_indices);
+        } else if (bad_amount == 1){
+            std::vector<int> new_report1(report.begin(), report.begin()+bad_indices.at(0));
+            new_report1.insert(new_report1.end(), report.begin()+bad_indices.at(0)+1, report.end());
+
+            std::vector<int> new_report2(report.begin(), report.begin()+bad_indices.at(0)+1);
+            new_report2.insert(new_report2.end(), report.begin()+bad_indices.at(0)+2, report.end());
+
+            if (checkSafe(new_report1, bad_indices) == 1 || checkSafe(new_report2, bad_indices) == 1){
+                is_ok2 = 1;
+            }
+        } else if(bad_amount == 2){
+            size_t bad1{bad_indices.at(0)};
+            size_t bad2{bad_indices.at(1)};
+            if (bad2 - bad1 == 1){
+                std::vector<int> new_report3(report.begin(), report.begin()+bad1+1);
+                new_report3.insert(new_report3.end(), report.begin()+bad2+1, report.end());
+                is_ok2 = checkSafe(new_report3, bad_indices);
+            }
+        }
+        task2_sol += (is_ok1 + is_ok2);
+    }
 
     const auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
     cout << std::format("Task 1 solution: {}\n", task1_sol);
-    cout << std::format("Task 2 solution: {}\n", "task2placeholder");
+    cout << std::format("Task 2 solution: {}\n", task2_sol);
     cout << std::format("Time taken: {}", elapsed_time) << std::endl;
     return 0;
 }
