@@ -80,11 +80,11 @@ int main(){
             if (checkSafe(new_report1, bad_indices) == 1 || checkSafe(new_report2, bad_indices) == 1){
                 is_ok2 = 1;
             }
-        } else if(bad_amount == 2){
+        } else if (bad_amount == 2){
             size_t bad1{bad_indices.at(0)};
             size_t bad2{bad_indices.at(1)};
             if (bad2 - bad1 == 1){
-                std::vector<int> new_report3(report.begin(), report.begin()+bad1+1);
+                std::vector<int> new_report3(report.begin(), report.begin()+bad2);
                 new_report3.insert(new_report3.end(), report.begin()+bad2+1, report.end());
                 is_ok2 = checkSafe(new_report3, bad_indices);
             }

@@ -55,6 +55,9 @@ namespace advoc{
             new_strings.push_back(str_arg.substr(start_pos));
             new_word = false;
             continue;
+        } else if ( (i == original_len-1) && (str_arg.at(i) != split_by && str_arg.at(i) != '\0') ){
+            new_strings.push_back(str_arg.substr(i));
+            continue;
         }
 
         // Check if skipping all split symbols and spaces. If so, keep going until new word starts
