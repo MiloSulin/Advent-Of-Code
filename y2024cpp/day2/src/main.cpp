@@ -15,7 +15,7 @@ using std::cout, std::array, std::string;
 For some reason my code always gives one too many for task 1 and two less for task 2.
  */
 
-uint checkSafe(std::vector<int> report, std::vector<size_t>& bad_ind){
+uint checkSafe(std::vector<int>& report, std::vector<size_t>& bad_ind){
     int delta_direction{0};
     uint is_ok{1}; // 1 or 0
     for (size_t i=0; i<report.size()-1; i++){
@@ -59,34 +59,46 @@ int main(){
     
     uint task1_sol{0};
     uint task2_sol{0};
+    std::vector<size_t> bad_indices{};
+    std::vector<int> new_report{};
+    std::vector<int> new_report2{};
     for (auto& report : num_lines){
-        std::vector<size_t> bad_indices{};
+        bad_indices.clear();
+        new_report.clear();
+        new_report2.clear();
         uint is_ok1{0};
-        is_ok1 = checkSafe(report, bad_indices);
+        is_ok1 = checkSafe(report, bad_indices); // check if level is safe
         task1_sol += is_ok1;
         
         size_t bad_amount{bad_indices.size()};
         uint is_ok2{0};
-        if (bad_amount == 1  && bad_indices.at(0) == 0){
-            std::vector<int> new_report(report.begin()+1, report.end());
-            is_ok2 = checkSafe(new_report, bad_indices);
+        // check if level can be saved
+        if (bad_amount == report.size()-2){
+            new_report.insert(new_report.end(), report.begin()+1, report.end());
+            
+            new_report2.insert(new_report2.end(), report.begin(), report.begin()+1);
+            new_report2.insert(new_report2.end(), report.begin()+2, report.end());
+            
+            if (checkSafe(new_report, bad_indices) == 1 || checkSafe(new_report2, bad_indices) == 1){
+                is_ok2 = 1;
+            }
         } else if (bad_amount == 1){
-            std::vector<int> new_report1(report.begin(), report.begin()+bad_indices.at(0));
-            new_report1.insert(new_report1.end(), report.begin()+bad_indices.at(0)+1, report.end());
+            new_report.insert(new_report.end(), report.begin(), report.begin()+bad_indices.at(0));
+            new_report.insert(new_report.end(), report.begin()+bad_indices.at(0)+1, report.end());
 
-            std::vector<int> new_report2(report.begin(), report.begin()+bad_indices.at(0)+1);
+            new_report2.insert(new_report2.end(), report.begin(), report.begin()+bad_indices.at(0)+1);
             new_report2.insert(new_report2.end(), report.begin()+bad_indices.at(0)+2, report.end());
 
-            if (checkSafe(new_report1, bad_indices) == 1 || checkSafe(new_report2, bad_indices) == 1){
+            if (checkSafe(new_report, bad_indices) == 1 || checkSafe(new_report2, bad_indices) == 1){
                 is_ok2 = 1;
             }
         } else if (bad_amount == 2){
             size_t bad1{bad_indices.at(0)};
             size_t bad2{bad_indices.at(1)};
             if (bad2 - bad1 == 1){
-                std::vector<int> new_report3(report.begin(), report.begin()+bad2);
-                new_report3.insert(new_report3.end(), report.begin()+bad2+1, report.end());
-                is_ok2 = checkSafe(new_report3, bad_indices);
+                new_report.insert(new_report.end(), report.begin(), report.begin()+bad2);
+                new_report.insert(new_report.end(), report.begin()+bad2+1, report.end());
+                is_ok2 = checkSafe(new_report, bad_indices);
             }
         }
         task2_sol += (is_ok1 + is_ok2);
