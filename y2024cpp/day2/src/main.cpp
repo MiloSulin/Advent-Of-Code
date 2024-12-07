@@ -43,7 +43,7 @@ int main(){
     const auto start_t = high_resolution_clock::now();
 
     array<char, 128 * 1024> input{};
-    advoc::readInput("../input.txt", &input[0], 128 * 1024);
+    uint char_amount = advoc::readInput("../input.txt", &input[0], 128 * 1024);
 
     std::vector<string> lines = advoc::stringSplit(string{input.begin(), input.end()}, '\n');
     std::vector<std::vector<int>> num_lines;
