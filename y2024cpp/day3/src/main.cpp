@@ -45,9 +45,11 @@ int main(){
         if ( std::strncmp(&input[i], "don't()", 7) == 0 && current_filter->start == 0 ){
             current_filter->start = data_counter;
             current_filter->end = valid_data.size();
+            i += 6;
         } else if ( std::strncmp(&input[i], "do()", 4) == 0 && current_filter->start != 0 ){
             current_filter->end = data_counter;
             current_filter += 1;
+            i += 3;
         } else if ( std::strncmp(&input[i], "mul(", 4) == 0 ){
             start_pos = i+4;
             current_pos = i+4;
@@ -71,6 +73,7 @@ int main(){
                     data_counter += 1;
                 }
             }
+            i = current_pos - 1;
         }
     }
 
