@@ -16,7 +16,7 @@ int main(){
     const auto start_t = high_resolution_clock::now();
 
     std::array<char, 128 * 1024> input;
-    advoc::readInput("../input.txt", &input[0], 128*1024);
+    uint read_chars = advoc::readInput("../input.txt", &input[0], 128*1024);
 
 
         
