@@ -95,7 +95,6 @@ int main(){
         }
     }
     cout << std::format("row length: {}\n", row_len);
-    /*uint read_chars = 110;*/
     row_amount = read_chars / row_len;
     cout << std::format("row amount: {}\n", row_amount);
     if (row_len >= read_chars){
@@ -109,18 +108,10 @@ int main(){
         }
         input_transpose.push_back('\n');
     }
-    /*for (auto& c : input_transpose){*/
-    /*    cout << c;*/
-    /*}*/
-    /*cout << '\n';*/
 
     // Get the diagonal "lines" of the input
     std::vector<char> diagonal_input1 = getDiagonals(input, row_len, row_amount, 0);
     std::vector<char> diagonal_input2 = getDiagonals(input, row_len, row_amount, 1);
-    /*for (auto& c : diagonal_input2){*/
-    /*    cout << c;*/
-    /*}*/
-    /*cout << '\n';*/
     
     // Search for every occurence of the word or its reverse
     size_t task1_sol{0};
@@ -140,8 +131,7 @@ int main(){
     // and now for diagonals
     char* diag1_pos = &diagonal_input1[0];
     char* diag2_pos = &diagonal_input2[0];
-    // TODO: FIX THIS BUG! CANNOT USE READ CHAR AMOUNT FOR DIAGONAL LINES BECAUSE OF EXTRA NEW LINES
-    for (size_t i=0; i<read_chars; i++){
+    for (size_t i=0; i<diagonal_input1.size(); i++){
         if (std::strncmp(diag1_pos, "XMAS", 4) == 0 || std::strncmp(diag1_pos, "SAMX", 4) == 0 ){
             task1_sol += 1;
         }
