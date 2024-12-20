@@ -3,3 +3,4 @@
 **/.vscode
 **/input.txt
 **/input
+**/compile_commands.json
