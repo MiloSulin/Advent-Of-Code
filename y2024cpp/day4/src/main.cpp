@@ -7,7 +7,7 @@
 #include <array>
 #include <vector>
 #include <cstring>
-#include "AdventOC.hpp"
+#include "../../../AdventOC.hpp"
 
 using namespace std::chrono;
 using std::cout;
@@ -94,9 +94,9 @@ int main(){
             break;
         }
     }
-    cout << std::format("row length: {}\n", row_len);
+    /*cout << std::format("row length: {}\n", row_len);*/
     row_amount = read_chars / row_len;
-    cout << std::format("row amount: {}\n", row_amount);
+    /*cout << std::format("row amount: {}\n", row_amount);*/
     if (row_len >= read_chars){
         std::cerr << std::format("Expected an input of matrix form! Was given a single line.");
     }
@@ -142,11 +142,43 @@ int main(){
         diag2_pos += 1;
     }
     
+    // check for cross words
+    size_t task2_sol{0};
+    uint current_loc{0};
+    char cross_diag1[4] = {' ', 'A', ' '};
+    char cross_diag2[4] = {' ', 'A', ' '};
+    bool diag1_istrue{false};
+    bool diag2_istrue{false};
+    for (size_t i=1; i<row_amount-1; i++){
+        for (size_t j=1; j<row_len-2; j++){
+            current_loc = i*row_len +j;
+            if (input[current_loc] == 'A'){
+                cross_diag1[0] = input[ (i-1)*row_len + (j-1) ];
+                cross_diag1[2] = input[ (i+1)*row_len + (j+1) ];
+                cross_diag2[0] = input[ (i-1)*row_len + (j+1) ];
+                cross_diag2[2] = input[ (i+1)*row_len + (j-1) ];
+                if (std::strncmp(&cross_diag1[0], "MAS", 3) == 0 || std::strncmp(&cross_diag1[0], "SAM", 3) == 0 ){
+                    diag1_istrue = true;
+                } else{
+                    diag1_istrue = false;
+                }
+                if (std::strncmp(&cross_diag2[0], "MAS", 3) == 0 || std::strncmp(&cross_diag2[0], "SAM", 3) == 0 ){
+                    diag2_istrue = true;
+                } else{
+                    diag2_istrue = false;
+                }
+                // final check
+                if (diag1_istrue && diag2_istrue){
+                    task2_sol += 1;
+                }
+            }
+        }
+    }
     
     const auto end_t = high_resolution_clock::now();
     duration<double, std::milli> elapsed_time{end_t - start_t};
     cout << std::format("Task 1 solution: {}\n", task1_sol);
-    cout << std::format("Task 2 solution: {}\n", "task2placeholder");
+    cout << std::format("Task 2 solution: {}\n", task2_sol);
     cout << std::format("Time taken: {}", elapsed_time) << std::endl;
     return 0;
 }

@@ -6,7 +6,7 @@
 #include <cmath>
 #include <array>
 #include <vector>
-#include "AdventOC.hpp"
+#include "../../../AdventOC.hpp"
 
 using namespace std::chrono;
 using std::cout;
