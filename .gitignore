@@ -4,3 +4,5 @@
 **/input.txt
 **/input
 **/compile_commands.json
+**/.zig-cache
+**/zig-out
